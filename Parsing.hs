@@ -146,8 +146,8 @@ option x p = p +++ return x
 
 optionMaybe :: Parser a -> Parser (Maybe a)
 optionMaybe p = option Nothing (do
-									x <- p
-									return (Just x))
+				x <- p
+				return (Just x))
 
 -- SepBy implementation
 
