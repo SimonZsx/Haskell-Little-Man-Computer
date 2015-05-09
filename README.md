@@ -6,8 +6,8 @@ Detailed discription of LMC: http://en.wikipedia.org/wiki/Little_man_computer
 
 LMC Instruction Code Reference 
 
-INP: ask user to type in a number then store it in the accumulator 
-STA: get the value in the accumulator then store it in the mailbox of the given label 
+INP: ask user to type in a number then store it in the accumulator \n 
+STA: get the value in the accumulator then store it in the mailbox of the given label \n
 LDA: get the value in the mailbox of the given label then store it in the accumulator 
 ADD: get the value in the mailbox of the given label, add it with the accumulator and store 
 SUB: subtract the value in mailbox of the given label from the value in the accumulator 
