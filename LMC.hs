@@ -1,4 +1,4 @@
-module Assignment3 where
+module LMC where
 
 import Parsing
 import Control.Monad.State
@@ -42,7 +42,7 @@ instruction = P ( \inp -> --firstly ignore the comment
                                                       _ -> [(read (instr ++ " \"" ++ label ++ "\"") :: Instruction ,out')]
                             _ -> error "Parse error" )
 
-
+--parse line
 line :: Parser (Maybe Label, Instruction)
 line =P ( \inp -> case parse (optionMaybe (many upper)) inp of
                      [(Just "",out)] -> case parse (token instruction) out of
@@ -51,13 +51,14 @@ line =P ( \inp -> case parse (optionMaybe (many upper)) inp of
                      [(label,out)] -> case parse (token instruction) out of
                                             [(instr,out2)]->[((label,instr),out2)] 
                                             _ -> [] )
-                    
+
+-- parse LMC language to program                
 parseLMC :: String -> Program
 parseLMC s = case parse (sepBy line (char '\n')) s of
                [(p, "")] -> p
                _ -> error "Parse error"
 
--- 
+-- show the Program
 showProgram :: Program -> String
 showProgram [] = ""  
 showProgram (x:xs) = (case x of
@@ -68,6 +69,7 @@ showProgram (x:xs) = (case x of
                                               DAT _ ->a ++ " " ++ show instr
                                               _ -> a ++ " " ++ fst ( head (parse (many letter) (show instr))) ++" "++ read ( snd (head (parse (many letter) (show instr))))::String )
                      ++ "\n" ++ showProgram xs
+-- type definition of the LMC
 
 type Addr = Int
 type Accumulator = Maybe Int
@@ -83,7 +85,7 @@ data Env
     , labelAddr :: [(String, Int)]
     } deriving (Show) -- the derving show is just for testing purpose
 
--- 
+--Initialization of Mailboxes
 initMailboxes :: Program -> [Mailbox]
 initMailboxes [] = []
 initMailboxes (x:xs) = case x of
@@ -100,7 +102,7 @@ initLabelAddr xs = labeladdrs ++ [(label,num)]
                              num = length (init xs)
                              labeladdrs = initLabelAddr (init xs)
 
-
+-- Initialization of the environment
 mkInitEnv :: Program -> Env
 mkInitEnv prog = Env mailB Nothing 0 instrs labelA
                     where mailB = initMailboxes prog
@@ -109,7 +111,7 @@ mkInitEnv prog = Env mailB Nothing 0 instrs labelA
 
 type IOEnv = StateT Env IO
 
--- 
+--Decode the LMC instrucitons and evaluate
 decode :: Instruction  -> IOEnv ()
 decode INP =
     do val <- liftIO (readLn :: IO Int)
@@ -217,6 +219,8 @@ nextInstruction =
        when (i == length (instructions env)) $ error "No more instructions"
        put $ env { pc = i + 1 }
        return $ instructions env !! i
+
+--evaluate Program
 
 evalProgram :: Program -> IO ()
 evalProgram [] = return ()
